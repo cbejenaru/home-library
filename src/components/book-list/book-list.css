@@ -1,0 +1,8 @@
+.Book-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.Book-grid__item {
+  width: 25%;
+}

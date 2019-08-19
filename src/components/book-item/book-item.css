@@ -1,0 +1,42 @@
+.Book {
+  width: 90%;
+  margin: 0 auto 15px;
+  padding: 5px;
+  min-height: 130px;
+  border: 1px solid #e8e8e8;
+  display: flex;
+}
+
+.Book:hover {
+  cursor: pointer;
+}
+
+.Book__title {
+  font-size: 16px;
+  line-height: 1.2;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.Book__author {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.Book__rate {
+  display: flex;
+  justify-content: center;
+}
+
+.Book__image {
+  width: 25%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+}
+
+.Book__info {
+  width: 75%;
+  padding-left: 10px;
+  display: inline-block;
+}
