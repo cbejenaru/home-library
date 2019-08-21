@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Col, Row, Rate, Tag, Form, Select, Button } from "antd";
 import "./book-modal.css";
 
-const BookModal = ({ shelves, categories, book, visible, onClose, onUpdateShelf }) => {
+import { Button, Col, Form, Rate, Row, Select, Tag } from "antd";
+import React, { useEffect, useState } from "react";
+
+import withRate from "../../hoc/withRate";
+import RateComponent from "../rate/rate";
+
+const BookModal = ({ shelves, categories, book, onUpdateShelf, coments, setComents }) => {
   const shelfChanged = shelf => {
     setShelf(shelf);
     onUpdateShelf({ ...book, shelfId: shelf });
@@ -15,13 +19,34 @@ const BookModal = ({ shelves, categories, book, visible, onClose, onUpdateShelf 
 
   const [shelf, setShelf] = useState();
 
+  const saveRatings = (type, id, value) => {
+    setComents([...coments, { type, id, value }]);
+  };
+  console.log(coments);
+
+  const getRate = () => {
+    const foundComents = coments.filter(c => c.id === book.id && c.type === "book");
+    console.log("foundComents: ", foundComents);
+    return (
+      <Rate
+        disabled
+        allowHalf
+        value={
+          foundComents.reduce((acc, el) => {
+            return acc + el.value.rate;
+          }, 0) / foundComents.length
+        }
+      />
+    );
+  };
+
   useEffect(() => {
     if (book) {
       setShelf(book.shelfId);
     }
   }, [book]);
   return (
-    <Modal footer={null} visible={visible} onCancel={onClose}>
+    <div>
       {book && (
         <div>
           <Row>
@@ -31,7 +56,7 @@ const BookModal = ({ shelves, categories, book, visible, onClose, onUpdateShelf 
             <Col span={16}>
               <div className="Param">
                 <div className="Label">Rating</div>
-                <Rate disabled allowHalf defaultValue={book.rating} />
+                {getRate()}
               </div>
               <div className="Param">
                 <div className="Label">Title</div>
@@ -98,10 +123,12 @@ const BookModal = ({ shelves, categories, book, visible, onClose, onUpdateShelf 
               Take from shelf
             </Button>
           </div>
+
+          <RateComponent type="book" id={book.id} saveRatings={saveRatings} />
         </div>
       )}
-    </Modal>
+    </div>
   );
 };
 
-export default Form.create({ name: "validate_other" })(BookModal);
+export default withRate(BookModal);

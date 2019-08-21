@@ -1,6 +1,6 @@
 import "./book-list.css";
 
-import { Pagination } from "antd";
+import { Pagination, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 
 import BookItem from "../book-item/book-item";
@@ -13,10 +13,10 @@ const BookList = ({ categories, shelves, books, updateBooks }) => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    pageCahange();
-  }, [books, shelves, page]);
+    changePage();
+  }, [books, page]);
 
-  const pageCahange = () => {
+  const changePage = () => {
     const displayed = books.filter(book => {
       return book.id < page * 12 && book.id >= (page - 1) * 12;
     });
@@ -50,14 +50,14 @@ const BookList = ({ categories, shelves, books, updateBooks }) => {
           setPage(p);
         }}
       />
-      <BookModal
-        categories={categories}
-        book={selectedBook}
-        onClose={closeModal}
-        visible={visible}
-        shelves={shelves}
-        onUpdateShelf={updateBooks}
-      />
+      <Modal footer={null} visible={visible} onCancel={closeModal}>
+        <BookModal
+          categories={categories}
+          book={selectedBook}
+          shelves={shelves}
+          onUpdateShelf={updateBooks}
+        />
+      </Modal>
     </div>
   );
 };

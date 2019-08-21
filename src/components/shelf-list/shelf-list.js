@@ -7,7 +7,7 @@ import ShelfFormModal from "../shelf-form-modal/shelf-form-modal";
 import ShelfModal from "../shelf-modal/shelf-modal";
 import ShelfTable from "../shelf-table/shelf-table";
 
-const ShelfList = ({ shelves, categories, updateShelves }) => {
+const ShelfList = ({ shelves, books, categories, updateShelves }) => {
   const [editVisible, setEditVisible] = useState(false);
   const [createVisible, setCreateVisible] = useState(false);
   const [selectedShelf, setSelectedShelf] = useState();
@@ -15,7 +15,6 @@ const ShelfList = ({ shelves, categories, updateShelves }) => {
   useEffect(() => {}, []);
 
   const editShelf = record => {
-    console.log("record: ", record);
     setEditVisible(true);
     setSelectedShelf(record);
   };
@@ -60,12 +59,10 @@ const ShelfList = ({ shelves, categories, updateShelves }) => {
         editShelf={editShelf}
         removeShelf={removeShelfConfirm}
       />
-      <ShelfModal
-        visible={editVisible}
-        shelf={selectedShelf}
-        categories={categories}
-        onCancel={closeEdit}
-      />
+      <Modal footer={null} visible={editVisible} onCancel={closeEdit}>
+        <ShelfModal shelf={selectedShelf} books={books} categories={categories} />
+      </Modal>
+
       <ShelfFormModal
         visible={createVisible}
         categories={categories}

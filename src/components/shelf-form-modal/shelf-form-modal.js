@@ -1,6 +1,7 @@
-import { Modal, Form, Input, Button, Select } from "antd";
-import React, { useEffect, useState } from "react";
 import "./shelf-form-modal.css";
+
+import { Button, Form, Input, Modal, Select } from "antd";
+import React, { useEffect } from "react";
 
 const ShelfFormModal = ({ categories, visible, onOk, onCancel, form }) => {
   const {

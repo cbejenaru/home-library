@@ -3,7 +3,24 @@ import "./book-item.css";
 import { Rate, Tag } from "antd";
 import React from "react";
 
-const BookItem = ({ book, view, categories }) => {
+import withRate from "../../hoc/withRate";
+
+const BookItem = ({ book, view, categories, coments }) => {
+  const getRate = () => {
+    const foundComents = coments.filter(c => c.id === book.id && c.type === "book");
+    console.log("foundComents: ", foundComents);
+    return (
+      <Rate
+        disabled
+        allowHalf
+        value={
+          foundComents.reduce((acc, el) => {
+            return acc + el.value.rate;
+          }, 0) / foundComents.length
+        }
+      />
+    );
+  };
   return (
     <div
       className="Book"
@@ -25,12 +42,10 @@ const BookItem = ({ book, view, categories }) => {
             );
           })}
         </div>
-        <div className="Book__rate">
-          <Rate disabled allowHalf defaultValue={book.rating} />
-        </div>
+        <div className="Book__rate">{getRate()}</div>
       </div>
     </div>
   );
 };
 
-export default BookItem;
+export default withRate(BookItem);

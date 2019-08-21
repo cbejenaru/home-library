@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 
 import BookList from "./components/book-list/book-list";
 import ShelfList from "./components/shelf-list/shelf-list";
+import ComentContext from "./ComentContext";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -18,6 +19,7 @@ const App = () => {
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [shelves, setShelves] = useState(shelvesInit());
+  const [coments, setComents] = useState([]);
 
   useEffect(() => {
     if (books.length === 0) {
@@ -75,55 +77,58 @@ const App = () => {
               </Link>
             </Menu.Item>
             <Menu.Item key="3">
-              <Link to="/reviewed-shelfs">
+              <Link to="/reviews">
                 <Icon type="check-square" />
-                <span className="nav-text">Reviewed Shelfs</span>
+                <span className="nav-text">Reviews</span>
               </Link>
             </Menu.Item>
           </Menu>
         </Sider>
         <Layout>
           <Header style={{ background: "#fff", padding: 0 }} />
-          <Content style={{ margin: "24px 16px 0" }}>
-            <div style={{ padding: 24, background: "#fff", minHeight: "calc(100vh - 158.2px)" }}>
-              <Route
-                exact
-                path="/"
-                render={() => (
-                  <BookList
-                    shelves={shelves}
-                    books={books}
-                    categories={categories}
-                    updateBooks={updateBooks}
-                  />
-                )}
-              />
-              <Route
-                path="/shelf-list"
-                render={() => (
-                  <ShelfList
-                    shelves={shelves}
-                    updateShelves={list => {
-                      setShelves([...list]);
-                    }}
-                    categories={categories}
-                  />
-                )}
-              />
-              <Route
-                path="/reviewed-shelfs"
-                render={() => (
-                  <ShelfList
-                    shelves={shelves}
-                    updateShelves={list => {
-                      setShelves([...list]);
-                    }}
-                    categories={categories}
-                  />
-                )}
-              />
-            </div>
-          </Content>
+          <ComentContext.Provider value={{ coments, setComents }}>
+            <Content style={{ margin: "24px 16px 0" }}>
+              <div style={{ padding: 24, background: "#fff", minHeight: "calc(100vh - 158.2px)" }}>
+                <Route
+                  exact
+                  path="/"
+                  render={() => (
+                    <BookList
+                      shelves={shelves}
+                      books={books}
+                      categories={categories}
+                      updateBooks={updateBooks}
+                    />
+                  )}
+                />
+                <Route
+                  path="/shelf-list"
+                  render={() => (
+                    <ShelfList
+                      shelves={shelves}
+                      books={books}
+                      updateShelves={list => {
+                        setShelves([...list]);
+                      }}
+                      categories={categories}
+                    />
+                  )}
+                />
+                <Route
+                  path="/reviewed-shelfs"
+                  render={() => (
+                    <ShelfList
+                      shelves={shelves}
+                      updateShelves={list => {
+                        setShelves([...list]);
+                      }}
+                      categories={categories}
+                    />
+                  )}
+                />
+              </div>
+            </Content>
+          </ComentContext.Provider>
           <Footer style={{ textAlign: "center" }}>Ant Design ©2018 Created by Ant UED</Footer>
         </Layout>
       </Layout>
