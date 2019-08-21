@@ -1,132 +1,79 @@
-import React, { Component } from "react";
-import { Table, Tag, Divider, Button, Rate, Modal } from "antd";
-import ShelfModal from "../shelf-modal/shelf-modal";
 import "./shelf-list.css";
 
-class ShelfList extends Component {
-  columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: text => <b>{text}</b>
-    },
-    {
-      title: "Number of books",
-      dataIndex: "booksCount",
-      key: "booksCount",
-      render: count => <span>{count > 0 ? count : "No books"}</span>
-    },
-    {
-      title: "Rating",
-      dataIndex: "rating",
-      key: "rating",
-      render: rating => (
-        <span>
-          <Rate disabled allowHalf defaultValue={rating} />
-        </span>
-      )
-    },
-    {
-      title: "Categories",
-      key: "categories",
-      dataIndex: "categories",
-      render: categories => (
-        <span>
-          {categories.lengt > 0
-            ? categories.map(tag => (
-                <Tag color="#87d068" key={tag}>
-                  {tag}
-                </Tag>
-              ))
-            : "No tags"}
-        </span>
-      )
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <span>
-          <Button type="link" onClick={this.openModal.bind(this, record)}>
-            Info
-          </Button>
-          <Divider type="vertical" />
-          <Button type="link" onClick={this.removeShelfConfirm.bind(this, record)}>
-            Delete
-          </Button>
-        </span>
-      )
-    }
-  ];
-  state = {
-    modalVisible: false,
-    shelves: [
-      {
-        key: "1",
-        name: "Shelf 1",
-        booksCount: 0,
-        rating: 0,
-        categories: ["test"]
-      },
-      {
-        key: "2",
-        name: "Shelf 2",
-        booksCount: 0,
-        rating: 0,
-        categories: ["test2"]
-      },
-      {
-        key: "3",
-        name: "Shelf 3",
-        booksCount: 0,
-        rating: 0,
-        categories: []
-      }
-    ]
+import { Button, Modal } from "antd";
+import React, { useEffect, useState } from "react";
+import uuidv1 from "uuid/v1";
+import ShelfFormModal from "../shelf-form-modal/shelf-form-modal";
+import ShelfModal from "../shelf-modal/shelf-modal";
+import ShelfTable from "../shelf-table/shelf-table";
+
+const ShelfList = ({ shelves, categories, updateShelves }) => {
+  const [editVisible, setEditVisible] = useState(false);
+  const [createVisible, setCreateVisible] = useState(false);
+  const [selectedShelf, setSelectedShelf] = useState();
+
+  useEffect(() => {}, []);
+
+  const editShelf = record => {
+    console.log("record: ", record);
+    setEditVisible(true);
+    setSelectedShelf(record);
   };
 
-  openModal(record) {
-    console.log("record: ", record);
-    this.setState({ selectedShelf: record, modalVisible: true });
-  }
-  closeModal() {
-    this.setState({ selectedShelf: null, modalVisible: false });
-  }
+  const closeEdit = () => {
+    setEditVisible(false);
+    setSelectedShelf();
+  };
 
-  removeShelfConfirm(shelf) {
+  const createShelf = () => {
+    setCreateVisible(true);
+  };
+  const closeCreate = () => {
+    setCreateVisible(false);
+  };
+
+  const removeShelfConfirm = shelf => {
     Modal.confirm({
       title: `Remove ${shelf.name}`,
       okText: "Remove",
       cancelText: "Cancel",
       onOk: () => {
-        const updatedShelfList = this.state.shelves.filter(item => item.key !== shelf.key);
-        this.setState({ shelves: [...updatedShelfList] });
+        const updatedShelfList = shelves.filter(item => item.key !== shelf.key);
+        updateShelves(updatedShelfList);
       }
     });
-  }
+  };
 
-  okPressed() {
-    if (this.state.selectedShelf) {
-    }
-  }
+  const saveNewShelf = newShelf => {
+    closeCreate();
+    updateShelves([...shelves, { ...newShelf, rating: 0, id: uuidv1() }]);
+  };
 
-  render() {
-    return (
-      <div>
-        <Button className="AddButton" type="primary" size="large">
-          Add a Shelf
-        </Button>
-        <Table columns={this.columns} dataSource={this.state.shelves} />
-        <ShelfModal
-          visible={this.state.modalVisible}
-          shelf={this.state.selectedShelf}
-          onOk={this.okPressed}
-          onCancel={this.closeModal.bind(this)}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Button className="AddButton" type="primary" size="large" onClick={createShelf}>
+        Add a Shelf
+      </Button>
+      <ShelfTable
+        categories={categories}
+        shelves={shelves}
+        editShelf={editShelf}
+        removeShelf={removeShelfConfirm}
+      />
+      <ShelfModal
+        visible={editVisible}
+        shelf={selectedShelf}
+        categories={categories}
+        onCancel={closeEdit}
+      />
+      <ShelfFormModal
+        visible={createVisible}
+        categories={categories}
+        onOk={saveNewShelf}
+        onCancel={closeCreate}
+      />
+    </div>
+  );
+};
 
 export default ShelfList;

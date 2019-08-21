@@ -1,0 +1,12 @@
+.Label {
+  font-weight: 600;
+}
+
+.Param {
+  margin-bottom: 15px;
+}
+
+.BookForm {
+  position: relative;
+  width: 100%
+}

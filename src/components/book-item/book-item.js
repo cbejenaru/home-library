@@ -3,23 +3,30 @@ import "./book-item.css";
 import { Rate, Tag } from "antd";
 import React from "react";
 
-const BookItem = props => {
-  const { title, thumbnailUrl, authors, categories, rating, onShelf } = props.book;
+const BookItem = ({ book, view, categories }) => {
   return (
-    <div className="Book">
-      <div className="Book__image" style={{ backgroundImage: "url(" + thumbnailUrl + ")" }} />
+    <div
+      className="Book"
+      onClick={() => {
+        view(book);
+      }}
+    >
+      <div className="Book__image" style={{ backgroundImage: "url(" + book.thumbnailUrl + ")" }} />
       <div className="Book__info">
-        <div className="Book__title">{title}</div>
-        <div className="Book__author">{authors.join(", ")}</div>
+        <div className="Book__title">{book.title}</div>
+        <div className="Book__author">{book.authors.join(", ")}</div>
         <div className="Book__categories">
-          {categories.map(element => (
-            <Tag color="#87d068" key={element}>
-              {element}
-            </Tag>
-          ))}
+          {book.categories.map(element => {
+            const category = categories.find(c => c.id === element);
+            return (
+              <Tag color="#87d068" key={category.id}>
+                {category.name}
+              </Tag>
+            );
+          })}
         </div>
         <div className="Book__rate">
-          <Rate disabled allowHalf defaultValue={rating} />
+          <Rate disabled allowHalf defaultValue={book.rating} />
         </div>
       </div>
     </div>

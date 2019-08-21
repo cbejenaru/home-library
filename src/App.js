@@ -1,7 +1,8 @@
 import "./App.css";
 
 import { Icon, Layout, Menu } from "antd";
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 
 import BookList from "./components/book-list/book-list";
@@ -9,20 +10,56 @@ import ShelfList from "./components/shelf-list/shelf-list";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-function App() {
+const App = () => {
+  const shelvesInit = () => {
+    const localShelves = localStorage.getItem("shelves");
+    return localShelves ? JSON.parse(localShelves) : [];
+  };
+  const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [shelves, setShelves] = useState(shelvesInit());
+
+  useEffect(() => {
+    if (books.length === 0) {
+      getBooks();
+    }
+    localStorage.setItem("shelves", JSON.stringify(shelves));
+  }, [shelves, books]);
+
+  const getBooks = async () => {
+    const response = await axios.get("/data/books.json");
+    const categories = response.data
+      .map(book => book.categories)
+      .reduce((acc, el) => {
+        const bookCategories = [];
+        el.forEach(category => {
+          if (acc.indexOf(category) < 0) {
+            bookCategories.push(category);
+          }
+        });
+        return [...acc, ...bookCategories];
+      }, [])
+      .map((category, index) => ({ name: category, id: index }));
+    const books = response.data.map((book, index) => ({
+      ...book,
+      id: index,
+      rating: 0,
+      shelfId: null,
+      categories: book.categories.map(category => categories.find(c => c.name === category).id)
+    }));
+    setCategories(categories);
+    setBooks(books);
+  };
+
+  const updateBooks = book => {
+    const index = books.findIndex(item => item.id === book.id);
+    books[index] = { ...book };
+  };
+
   return (
     <Router>
       <Layout>
-        <Sider
-          breakpoint="lg"
-          collapsedWidth="0"
-          onBreakpoint={broken => {
-            console.log(broken);
-          }}
-          onCollapse={(collapsed, type) => {
-            console.log(collapsed, type);
-          }}
-        >
+        <Sider breakpoint="lg" collapsedWidth="0">
           <div className="logo">Digital Library</div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={["4"]}>
             <Menu.Item key="1">
@@ -49,9 +86,42 @@ function App() {
           <Header style={{ background: "#fff", padding: 0 }} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, background: "#fff", minHeight: "calc(100vh - 158.2px)" }}>
-              <Route exact path="/" component={BookList} />
-              <Route path="/shelf-list" component={ShelfList} />
-              <Route path="/reviewed-shelfs" component={BookList} />
+              <Route
+                exact
+                path="/"
+                render={() => (
+                  <BookList
+                    shelves={shelves}
+                    books={books}
+                    categories={categories}
+                    updateBooks={updateBooks}
+                  />
+                )}
+              />
+              <Route
+                path="/shelf-list"
+                render={() => (
+                  <ShelfList
+                    shelves={shelves}
+                    updateShelves={list => {
+                      setShelves([...list]);
+                    }}
+                    categories={categories}
+                  />
+                )}
+              />
+              <Route
+                path="/reviewed-shelfs"
+                render={() => (
+                  <ShelfList
+                    shelves={shelves}
+                    updateShelves={list => {
+                      setShelves([...list]);
+                    }}
+                    categories={categories}
+                  />
+                )}
+              />
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>Ant Design ©2018 Created by Ant UED</Footer>
@@ -59,6 +129,6 @@ function App() {
       </Layout>
     </Router>
   );
-}
+};
 
 export default App;

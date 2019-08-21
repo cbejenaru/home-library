@@ -1,0 +1,9 @@
+.FormActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.CreateButton {
+  margin-right: 15px;
+}

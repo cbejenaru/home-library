@@ -1,74 +1,65 @@
 import "./book-list.css";
 
 import { Pagination } from "antd";
-import axios from "axios";
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 
 import BookItem from "../book-item/book-item";
+import BookModal from "../book-modal/book-modal";
 
-class BookList extends Component {
-  constructor(props) {
-    super(props);
-    this.pageCahange = this.pageCahange.bind(this);
-  }
-  state = { books: [], categories: [], displayedBooks: [] };
-  componentDidMount() {
-    axios.get("/data/books.json").then(response => {
-      const categories = response.data
-        .map(book => book.categories)
-        .reduce((acc, el) => {
-          const bookCategories = [];
-          el.forEach(category => {
-            if (acc.indexOf(category) < 0) {
-              bookCategories.push(category);
-            }
-          });
-          return [...acc, ...bookCategories];
-        }, []);
-      const books = response.data.map((book, index) => ({
-        ...book,
-        id: index,
-        rating: 0,
-        onShelf: false
-      }));
-      const displayedBooks = [...response.data.filter((book, index) => index < 12 && index >= 0)];
-      this.setState({
-        books,
-        categories,
-        displayedBooks
-      });
+const BookList = ({ categories, shelves, books, updateBooks }) => {
+  const [visible, setVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState();
+  const [displayedBooks, setDisplayedBooks] = useState([]);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    pageCahange();
+  }, [books, shelves, page]);
+
+  const pageCahange = () => {
+    const displayed = books.filter(book => {
+      return book.id < page * 12 && book.id >= (page - 1) * 12;
     });
-  }
+    setDisplayedBooks(displayed);
+  };
 
-  pageCahange(page) {
-    this.setState({
-      displayedBooks: this.state.books.filter(book => {
-        // console.log(book.id < page * 10 && book.id >= (page - 1) * 10);
-        return book.id < page * 12 && book.id >= (page - 1) * 12;
-      })
-    });
-  }
+  const viewBook = book => {
+    setVisible(true);
+    setSelectedBook(book);
+  };
 
-  render() {
-    return (
-      <div>
-        <div className="Book-grid">
-          {this.state.displayedBooks.map((book, index) => (
-            <div className="Book-grid__item" key={index}>
-              <BookItem book={book} />
-            </div>
-          ))}
-        </div>
+  const closeModal = () => {
+    setVisible(false);
+  };
 
-        <Pagination
-          pageSize={12}
-          defaultCurrent={1}
-          total={this.state.books.length}
-          onChange={this.pageCahange}
-        />
+  return (
+    <div>
+      <div className="Book-grid">
+        {displayedBooks.map((book, index) => (
+          <div className="Book-grid__item" key={index}>
+            <BookItem categories={categories} book={book} view={viewBook} />
+          </div>
+        ))}
       </div>
-    );
-  }
-}
+
+      <Pagination
+        pageSize={12}
+        defaultCurrent={1}
+        total={books.length}
+        onChange={p => {
+          setPage(p);
+        }}
+      />
+      <BookModal
+        categories={categories}
+        book={selectedBook}
+        onClose={closeModal}
+        visible={visible}
+        shelves={shelves}
+        onUpdateShelf={updateBooks}
+      />
+    </div>
+  );
+};
 
 export default BookList;
