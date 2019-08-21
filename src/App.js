@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 
 import BookList from "./components/book-list/book-list";
 import ShelfList from "./components/shelf-list/shelf-list";
+import ReviewsPage from "./components/reviews-page/reviews-page";
 import ComentContext from "./ComentContext";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -16,17 +17,27 @@ const App = () => {
     const localShelves = localStorage.getItem("shelves");
     return localShelves ? JSON.parse(localShelves) : [];
   };
+  const comentsInit = () => {
+    const localComents = localStorage.getItem("coments");
+    return localComents
+      ? JSON.parse(localComents).map(coment => ({
+          ...coment,
+          createdAt: new Date(coment.createdAt)
+        }))
+      : [];
+  };
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [shelves, setShelves] = useState(shelvesInit());
-  const [coments, setComents] = useState([]);
+  const [coments, setComents] = useState(comentsInit());
 
   useEffect(() => {
     if (books.length === 0) {
       getBooks();
     }
     localStorage.setItem("shelves", JSON.stringify(shelves));
-  }, [shelves, books]);
+    localStorage.setItem("coments", JSON.stringify(coments));
+  }, [shelves, books, coments]);
 
   const getBooks = async () => {
     const response = await axios.get("/data/books.json");
@@ -115,16 +126,8 @@ const App = () => {
                   )}
                 />
                 <Route
-                  path="/reviewed-shelfs"
-                  render={() => (
-                    <ShelfList
-                      shelves={shelves}
-                      updateShelves={list => {
-                        setShelves([...list]);
-                      }}
-                      categories={categories}
-                    />
-                  )}
+                  path="/reviews"
+                  render={() => <ReviewsPage books={books} shelves={shelves} />}
                 />
               </div>
             </Content>

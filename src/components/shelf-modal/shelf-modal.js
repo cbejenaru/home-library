@@ -25,7 +25,7 @@ const ShelfModal = ({ shelf, categories, books, coments, setComents }) => {
   };
 
   const saveRatings = (type, id, value) => {
-    setComents([...coments, { type, id, value }]);
+    setComents([...coments, { type, id, value, createdAt: new Date() }]);
   };
 
   const getRate = () => {

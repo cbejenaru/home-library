@@ -20,13 +20,12 @@ const BookModal = ({ shelves, categories, book, onUpdateShelf, coments, setComen
   const [shelf, setShelf] = useState();
 
   const saveRatings = (type, id, value) => {
-    setComents([...coments, { type, id, value }]);
+    setComents([...coments, { type, id, value, createdAt: new Date() }]);
   };
-  console.log(coments);
 
   const getRate = () => {
     const foundComents = coments.filter(c => c.id === book.id && c.type === "book");
-    console.log("foundComents: ", foundComents);
+
     return (
       <Rate
         disabled

@@ -1,8 +1,9 @@
 import "./shelf-list.css";
 
 import { Button, Modal } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import uuidv1 from "uuid/v1";
+
 import ShelfFormModal from "../shelf-form-modal/shelf-form-modal";
 import ShelfModal from "../shelf-modal/shelf-modal";
 import ShelfTable from "../shelf-table/shelf-table";
@@ -11,8 +12,6 @@ const ShelfList = ({ shelves, books, categories, updateShelves }) => {
   const [editVisible, setEditVisible] = useState(false);
   const [createVisible, setCreateVisible] = useState(false);
   const [selectedShelf, setSelectedShelf] = useState();
-
-  useEffect(() => {}, []);
 
   const editShelf = record => {
     setEditVisible(true);
@@ -45,7 +44,8 @@ const ShelfList = ({ shelves, books, categories, updateShelves }) => {
 
   const saveNewShelf = newShelf => {
     closeCreate();
-    updateShelves([...shelves, { ...newShelf, rating: 0, id: uuidv1() }]);
+    const id = uuidv1();
+    updateShelves([...shelves, { ...newShelf, id, key: id }]);
   };
 
   return (

@@ -8,7 +8,7 @@ import withRate from "../../hoc/withRate";
 const BookItem = ({ book, view, categories, coments }) => {
   const getRate = () => {
     const foundComents = coments.filter(c => c.id === book.id && c.type === "book");
-    console.log("foundComents: ", foundComents);
+
     return (
       <Rate
         disabled
