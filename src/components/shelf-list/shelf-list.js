@@ -55,6 +55,7 @@ const ShelfList = ({ shelves, books, categories, updateShelves }) => {
       </Button>
       <ShelfTable
         categories={categories}
+        books={books}
         shelves={shelves}
         editShelf={editShelf}
         removeShelf={removeShelfConfirm}

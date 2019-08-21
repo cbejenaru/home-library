@@ -1,7 +1,8 @@
 import { Table, Tag, Rate, Divider, Button } from "antd";
+import withRate from "../../hoc/withRate";
 
 import React from "react";
-const ShelfTable = ({ shelves, categories, editShelf, removeShelf }) => {
+const ShelfTable = ({ coments, books, shelves, categories, editShelf, removeShelf }) => {
   const columns = [
     {
       title: "Name",
@@ -11,19 +12,18 @@ const ShelfTable = ({ shelves, categories, editShelf, removeShelf }) => {
     },
     {
       title: "Number of books",
-      dataIndex: "books",
-      key: "books",
-      render: books => <span>No books</span>
+      dataIndex: "id",
+      key: "id",
+      render: id => {
+        const foundBooks = books.filter(b => b.shelfId === id);
+        return <span>{foundBooks.length}</span>;
+      }
     },
     {
       title: "Rating",
-      dataIndex: "rating",
-      key: "rating",
-      render: rating => (
-        <span>
-          <Rate disabled allowHalf defaultValue={rating} />
-        </span>
-      )
+      dataIndex: "id",
+      key: "id",
+      render: id => <span>{getRate(id)}</span>
     },
     {
       title: "Categories",
@@ -71,7 +71,22 @@ const ShelfTable = ({ shelves, categories, editShelf, removeShelf }) => {
       )
     }
   ];
+
+  const getRate = id => {
+    const foundComents = coments.filter(c => c.id === id);
+    return (
+      <Rate
+        disabled
+        allowHalf
+        value={
+          foundComents.reduce((acc, el) => {
+            return acc + el.value.rate;
+          }, 0) / foundComents.length
+        }
+      />
+    );
+  };
   return <Table columns={columns} categories={categories} dataSource={shelves} />;
 };
 
-export default ShelfTable;
+export default withRate(ShelfTable);
